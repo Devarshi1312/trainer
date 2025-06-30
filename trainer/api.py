@@ -142,7 +142,7 @@ def signup_User(email, first_name, password, last_name=None, roles=None):
 #            message="Hello, {}! Welcome to our platform.".format(first_name)
 #        )
         
-        return {"status": "success", "message": "User created successfully", "user": user_doc, "key_details":generate_key(email)}
+        frappe.response["data"] = {"status": "success", "message": "User created successfully", "user_details": user_doc, "key_details":generate_key(email)}
 
     except Exception as e:
         frappe.log_error(f"Error creating user: {str(e)}", "Custom Signup Error")
@@ -534,24 +534,22 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
     if user and user != "Guest":
         wishlist_entries = frappe.get_all(
             "Wishlist",
-            filters={"user": user},
-            fields=["trainer"]
+            filters={"users": user},
+            fields=["trainers"]
         )
-        wishlisted = {entry.trainer for entry in wishlist_entries}
+        wishlisted = {entry.trainers for entry in wishlist_entries}
 
     # Append is_wishlisted flag
     for trainer in trainers:
-        trainer["is_wishlisted"] = trainer["name"] in wishlisted
+        trainer["is_wishlisted"] = 1 if trainer["name"] in wishlisted else 0
 
     frappe.response["data"] = {
         "results": trainers,
         "total": total_count,
         "page": page,
         "page_size": page_size,
-        "total_pages": (total_count + page_size - 1) // page_size
+        "total_pages": (total_count + page_size - 1) // page_size,
     }
-
-
 
 @frappe.whitelist(allow_guest=True)
 def company_trainers(user, page=1, page_size=8):
