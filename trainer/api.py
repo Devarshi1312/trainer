@@ -673,7 +673,10 @@ def get_trainer(trainer_id):
         frappe.response["http_status_code"] = 404
         frappe.response["message"] = _("Trainer not found")
         return
-
+    unlocks = frappe.get_all(
+	"Unlocked Trainers",
+	filters={"trainer":trainer_id}
+    )
     # Fetch reviews
     reviews = frappe.get_all(
         "Ratings_Reviews",
@@ -701,6 +704,7 @@ def get_trainer(trainer_id):
         "avg_rating": avg_rating,
 	"total_reviews":len(reviews),
         "image": trainer_doc.image,
+	"total_unlocks":len(unlocks),
         "training_approach": trainer_doc.training_approach,
         "education": [
             {
@@ -731,10 +735,10 @@ def get_trainer(trainer_id):
         ],
         "reviews": [
             {
-                "reviewer_name": r.reviewer_name,
+                "review": r.review,
                 "rating": r.rating,
-                "review_text": r.review_text,
-                "created_on": r.created_on
+                "user_name": r.user_name,
+                "creation": r.created_on
             } for r in reviews
         ],
         "workshop": trainer_doc.workshop,
@@ -769,6 +773,10 @@ def get_trainer_profile(trainer_id):
             "user": user,
             "trainer": trainer_id
         })
+    unlocks = frappe.get_all(
+        "Unlocked Trainers",
+        filters={"trainer":trainer_id}
+    )
 
     # Fetch reviews
     reviews = frappe.get_all(
@@ -795,6 +803,7 @@ def get_trainer_profile(trainer_id):
         "profile_views": trainer_doc.profile_views,
         "avg_rating": avg_rating,
         "image": trainer_doc.image,
+	"total_unlocks":len(unlocks),
 	"total_reviews":len(reviews),
         "training_approach": trainer_doc.training_approach,
         "education": [
