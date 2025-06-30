@@ -1,0 +1,318 @@
+{%- extends "templates/web.html" -%}
+
+{%- block content -%}
+
+  <div class="container1">
+    <header>
+      <h1>Choose Your Subscription Plan</h1>
+      <p class="subtitle">Select the perfect plan that meets your needs and unlock premium features to enhance your experience.</p>
+    </header>
+    
+    <div class="plans-container">
+      <!-- Basic Plan -->
+      <div class="plan-card basic-plan">
+        <div class="plan-header">
+          <div class="plan-name">Basic Plan</div>
+          <div class="plan-price">100/-</div>
+          <!-- <div class="plan-billing">per month</div> -->
+        </div>
+        <div class="plan-body">
+          <ul class="feature-list">
+            <li>100 Credits</li>
+            <li>Basic Support</li>
+            <li>Access to Standard Features</li>
+            <li>Single Device Login</li>
+            <li>7-Day Money Back Guarantee</li>
+          </ul>
+          <form onsubmit="event.preventDefault(); makePayment(100)">
+            <button type="submit" class="subscribe-btn">Get Started</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Standard Plan -->
+      <div class="plan-card standard-plan">
+        <!-- <div class="popular-badge">Most Popular</div> -->
+        <div class="plan-header">
+          <div class="plan-name">Standard Plan</div>
+          <div class="plan-price">250/-</div>
+          <!-- <div class="plan-billing">per month</div> -->
+        </div>
+        <div class="plan-body">
+          <ul class="feature-list">
+            <li>300 Credits</li>
+            <li>Priority Support</li>
+            <li>Access to Premium Features</li>
+            <li>Multi-Device Login</li>
+            <li>Advanced Analytics</li>
+            <li>30-Day Money Back Guarantee</li>
+          </ul>
+          <form onsubmit="event.preventDefault(); makePayment(250)">
+            <button type="submit" class="subscribe-btn">Subscribe Now</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Premium Plan -->
+      <div class="plan-card premium-plan">
+        <div class="plan-header">
+          <div class="plan-name">Premium Plan</div>
+          <div class="plan-price">500/-</div>
+          <!-- <div class="plan-billing">per month</div> -->
+        </div>
+        <div class="plan-body">
+          <ul class="feature-list">
+            <li>Unlimited Credits</li>
+            <li>24/7 VIP Support</li>
+            <li>Access to All Features</li>
+            <li>Priority Processing</li>
+            <li>Custom Solutions</li>
+            <li>Advanced API Access</li>
+            <li>Dedicated Account Manager</li>
+          </ul>
+          <form onsubmit="event.preventDefault(); makePayment(500)">
+            <button type="submit" class="subscribe-btn">Go Premium</button>
+          </form>
+        </div>
+        
+        </div>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function makePayment(amount){
+        fetch(`http://trainer.localhost:8000/api/method/trainer.api.create_checkout_session?amount=${amount}`, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'X-Frappe-CSRF-Token': frappe.csrf_token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message.session_id && data.message.redirect_url) {
+            window.location.href = data.message.redirect_url;
+            } else {
+            showToast("Error", "Failed to create payment session: " + (data.message.error || "Unknown error"), "error");
+            }
+        })
+        .catch(error => {
+            console.error("Error creating payment session:", error);
+            showToast("Error", "Failed to create payment session", "error");
+        });
+        }
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Page loaded, payment buttons ready");
+    });
+</script>
+
+{%- endblock -%}
+{%- block style -%}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  body {
+    background-color: #f8f9fa;
+    color: #333;
+  }
+  
+  .container1 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  
+  h1 {
+    font-size: 36px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+  }
+  
+  .subtitle {
+    font-size: 18px;
+    color: #7f8c8d;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .plans-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+  
+  .plan-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+    width: 320px;
+    transition: all 0.3s ease;
+  }
+  
+  .plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  }
+  
+  .plan-header {
+    padding: 25px 20px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .basic-plan .plan-header {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    color: white;
+  }
+  
+  .standard-plan .plan-header {
+    background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+    color: white;
+  }
+  
+  .premium-plan .plan-header {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+    color: #2d3436;
+  }
+  
+  .plan-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .plan-price {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 15px 0 5px;
+  }
+  
+  .plan-billing {
+    font-size: 14px;
+    opacity: 0.8;
+  }
+  
+  .plan-body {
+    padding: 30px 20px;
+  }
+  
+  .feature-list {
+    list-style: none;
+    margin-bottom: 30px;
+  }
+  
+  .feature-list li {
+    margin-bottom: 15px;
+    padding-left: 25px;
+    position: relative;
+  }
+  
+  .feature-list li:before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    color: #2ecc71;
+  }
+  
+  .subscribe-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 50px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .basic-plan .subscribe-btn {
+    background-color: #0984e3;
+    color: white;
+  }
+  
+  .standard-plan .subscribe-btn {
+    background-color: #6c5ce7;
+    color: white;
+  }
+  
+  .premium-plan .subscribe-btn {
+    background-color: #fdcb6e;
+    color: #2d3436;
+  }
+  
+  .subscribe-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .basic-plan .subscribe-btn:hover {
+    background-color: #0876c7;
+  }
+  
+  .standard-plan .subscribe-btn:hover {
+    background-color: #5c4dd0;
+  }
+  
+  .premium-plan .subscribe-btn:hover {
+    background-color: #f0b94d;
+  }
+  
+  .popular-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .standard-plan {
+    position: relative;
+    z-index: 1;
+    transform: scale(1.05);
+  }
+  
+  .standard-plan:hover {
+    transform: translateY(-10px) scale(1.05);
+  }
+  
+  @media (max-width: 768px) {
+    .plans-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .standard-plan {
+      transform: scale(1);
+    }
+    
+    .standard-plan:hover {
+      transform: translateY(-10px) scale(1);
+    }
+  }
+</style>
+{%- endblock -%}
+

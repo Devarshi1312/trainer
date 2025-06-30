@@ -1,0 +1,163 @@
+{%- extends "templates/web.html" -%}
+
+{%- block content -%}
+
+<section class="container trainer-profile" id="trainerProfile">
+    <nav class="breadcrumb">
+         <a href="/trainerpage">All Trainers</a> > {{ trainer.first_name }} {{ trainer.last_name }}
+    </nav>
+
+    <div class="profile-header">
+        <div class="header-content">
+            <div class="trainer-image">
+                <img src="{{ trainer.image }}" alt="{{ trainer.full_name }}" />
+                <h1>{{ trainer.first_name }} {{ trainer.last_name }}</h1>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <i class="icon-map"></i>
+                    <div>
+                        <h3>Location</h3>
+                        <p>{{ trainer.location }}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="icon-briefcase"></i>
+                    <div>
+                        <h3>Expertise</h3>
+                        <p>{{ trainer.expertise_in }}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="icon-rupee"></i>
+                    <div>
+                        <h3>Charges</h3>
+                        <p>₹ {{ trainer.charge }}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="icon-user"></i>
+                    <div>
+                        <h3>Age</h3>
+                        <p>{{ trainer.age }} years</p>
+                    </div>
+                </div>
+            </div>
+            <p class="bio">{{ trainer.bio_line }}</p>
+        </div>
+        <a href="/trainer-booking?trainer_id={{ trainer.name }}" class="btn btn-primary book-now">Book Now</a>
+    </div>
+
+    <div class="programs-section">
+        <h2>Training Programs</h2>
+        <div class="programs-grid">
+            {% for program in trainer.program_list %}
+            <div class="program-card">
+                <img src="{{ program.program_image }}" alt="{{ program.objective }}" />
+                <h3>{{ program.objective }}</h3>
+                <p>{{ program.program_description }}</p>
+                <p class="duration">Duration: {{ (program.program_duration_in_hrs/24/3600) | round }} days</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{%- endblock -%}
+
+{%- block style -%}
+<style>
+      .trainer-header {
+            background: linear-gradient(130deg, #de463e -8.23%, #ff8a00 72.36%);
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            color: white;
+            border-radius: 0 0 0 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .trainer-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .trainer-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+    
+    .trainer-profile {
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .trainer-image img {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        padding: 1rem;
+        background: var(--card-bg);
+        border-radius: 8px;   
+        background: linear-gradient(128.49deg, #de463e -8.23%, #ff8a00 72.36%);
+        color: white;
+    }
+    .info-item h3{
+        color: white;
+    }
+
+    .programs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .program-card {
+        background: var(--card-bg);
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .program-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .bio {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin: 1rem 0;
+    }
+
+    .duration {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+</style>
+{%- endblock -%}

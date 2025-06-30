@@ -1,0 +1,233 @@
+{% extends "templates/web.html" %}
+
+{% block content %}
+<div class="contact-page">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container flex">
+        <div class="hero_header">
+            <h3>Get in Touch</h3>
+            <h1>Have More Enquiries ?</h1>
+            <p>Bring your group together and create lasting memories with our variety of fun and engaging activities. Whether it’s a Virtual or an In-person Program, we will enable you to make it truly remarkable!
+            </p>
+        </div>
+        <div class="contact-info">
+            <h2>Our Contact Details</h2>
+            <p>📍 1234 Business Street, City, Country</p>
+            <p>📞 +123 456 7890</p>
+            <p>📧 contact@yourcompany.com</p>
+            <p>🕒 Monday - Friday: 9 AM - 6 PM</p>
+
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Contact Form & Info Grid -->
+    <section class="contact-container">
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <h2>Send Us a Message</h2>
+            <form method="POST" action="/api/method/your_app.contact_form">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" rows="5" required></textarea>
+                </div>
+
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}
+{%- block style -%}
+<style>
+    /* General Page Styling */
+.contact-page {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fc;
+    padding-bottom: 50px;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(128.49deg, #de463e -8.23%, #ff8a00 72.36%);
+    color: white;
+    text-align: left;
+    padding: 60px 20px;
+}
+
+.hero_header{
+    margin-left: 10%;
+    align-items: left;
+    width: 60%;
+    margin-right: 10%;
+}
+.hero_header h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.hero_header p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* Contact Form & Info Container */
+.contact-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 50px 20px;
+}
+
+/* Contact Form */
+.contact-form {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 800px;
+}
+
+.contact-form h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.contact-form button {
+    width: 100%;
+    background:linear-gradient(128.49deg, #de463e -8.23%, #ff8a00 72.36%);
+    color: white;
+    padding: 12px;
+    border: none;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.contact-form button:hover {
+    transform: translateY(-2px);
+}
+
+/* Contact Info */
+.contact-info {
+    background: #ffebd0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+}
+
+.contact-info h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.contact-info p {
+    font-size: 1.1rem;
+    margin: 8px 0;
+    color: #555;
+}
+
+/* Social Icons */
+.social-icons {
+    margin-top: 15px;
+}
+
+.social-icons a {
+    font-size: 1.8rem;
+    margin: 0 10px;
+    color: #4a90e2;
+    transition: 0.3s;
+}
+
+.social-icons a:hover {
+    color: #8e44ad;
+}
+
+/* Google Map */
+.map {
+    text-align: center;
+    margin-top: 50px;
+    padding: 50px 20px;
+    background: #f8f8f8;
+}
+
+.map h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.map-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .contact-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .contact-form, .contact-info {
+        width: 90%;
+    }
+}
+@media (max-width: 400px) {
+    .container {
+        flex-direction: row;
+    }
+}
+</style>
+{%- endblock -%}
+
+
+
+

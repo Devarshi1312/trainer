@@ -1,0 +1,501 @@
+{%- extends "templates/web.html" -%}
+
+{% block head_include %}
+<style>
+  /* Custom styles for enhanced trainer listing */
+  .trainer-header {
+    background: linear-gradient(130deg, #de463e -8.23%, #ff8a00 72.36%);
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    color: white;
+    border-radius: 0 0 0 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .trainer-header h1 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .trainer-header p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+  }
+  
+  .credits-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .credits-badge i {
+    color: #FFD700;
+  }
+  
+  .custom-tabs {
+    border-bottom: none;
+    margin-bottom: 2rem;
+    gap: 0.5rem;
+  }
+  
+  .custom-tabs .nav-item {
+    margin-bottom: 0;
+  }
+  
+  .custom-tabs .nav-link {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #495057;
+    transition: all 0.3s ease;
+  }
+  
+  .custom-tabs .nav-link:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .custom-tabs .nav-link.active {
+    color: white;
+    background: linear-gradient(128.49deg, #de463e -8.23%, #ff8a00 72.36%);
+    box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
+  }
+  
+  .search-container {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+  
+  .search-container input {
+    padding: 1rem 1rem 1rem 3rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .search-container input:focus {
+    box-shadow: 0 2px 15px rgba(37, 117, 252, 0.15);
+    border-color: #ff9138;
+  }
+  
+  .search-container i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+  
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #333;
+    position: relative;
+    padding-bottom: 0.75rem;
+  }
+  
+  .section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 4px;
+    background: linear-gradient(128.49deg, #de463e -8.23%, #ff8a00 72.36%);
+    border-radius: 2px;
+  }
+  
+  .trainer-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+  
+  .trainer-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .trainer-card .card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .trainer-card .card-img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem 0 0 1rem;
+  }
+  
+  .trainer-card .card-body {
+    padding: 1.5rem;
+  }
+  
+  .trainer-card .card-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .trainer-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: #555;
+  }
+  
+  .trainer-info i {
+    width: 20px;
+    margin-right: 0.5rem;
+    color: #6a11cb;
+  }
+  
+  .price-tag {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #6a11cb;
+  }
+  
+  .btn-unlock {
+    background: linear-gradient(128.49deg, #de463e -8.23%, #ff8a00 72.36%);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
+  }
+  
+  .btn-unlock:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 117, 252, 0.3);
+  }
+  
+  .btn-view {
+    background: white;
+    color: #6a11cb;
+    border: 2px solid #6a11cb;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-view:hover {
+    background: #6a11cb;
+    color: white;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 1rem;
+    margin: 2rem 0;
+  }
+  
+  .empty-state h4 {
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .trainer-card .card-img {
+      height: 200px;
+      border-radius: 1rem 1rem 0 0;
+    }
+  }
+</style>
+{% endblock %}
+{% block content %}
+<!-- Hero Header Section -->
+<section class="trainer-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1>Find Your Perfect Trainer</h1>
+        <p>Discover expert trainers who can help you achieve your goals</p>
+      </div>
+      <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
+        <div class="credits-badge">
+          <i class="fas fa-coins"></i>
+          <span>Your Credits: {{credits}}</span>
+        </div>
+        <form onsubmit="event.preventDefault(); makePayment(this.amount.value)">
+          <input type="number" name="amount" placeholder="Enter amount in INR" required>
+          <button type="submit">Buy Credits</button>
+        </form>
+      </div>
+    </div>
+    <!-- Search Bar -->
+    <div class="search-container">
+        <i class="fas fa-search"></i>
+        <h3>Search for Trainers</h3>
+        <input type="text" id="trainerSearch" class="form-control" placeholder="Search trainers by name, expertise, or location...">
+      </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <!-- Tabs for switching between All Trainers and Unlocked Trainers -->
+    <ul class="nav custom-tabs" id="trainerTabs">
+      <li class="nav-item">
+        <a class="nav-link active" id="all-trainers-tab" data-bs-toggle="tab" href="#allTrainers">
+          <i class="fas fa-users me-2"></i>All Trainers
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="unlocked-trainers-tab" data-bs-toggle="tab" href="#unlockedTrainers">
+          <i class="fas fa-unlock me-2"></i>Unlocked Trainers
+        </a>
+      </li>
+    </ul>
+    <!-- Main Content -->
+    <div class="tab-content">
+      <!-- All Trainers Tab -->
+      <div class="tab-pane fade show active" id="allTrainers">
+        <h2 class="section-title">Available Trainers</h2>
+        <p class="mb-4">Browse our selection of professional trainers and unlock access to their profiles</p>
+        <div class="row trainer-list" id="allTrainerList">
+          {% if not trainers %}
+            <div class="col-12">
+              <div class="empty-state">
+                <i class="fas fa-user-slash"></i>
+                <h4>No trainers found</h4>
+                <p>We couldn't find any trainers matching your criteria. Please try again later.</p>
+              </div>
+            </div>
+          {% endif %}
+          {% for trainer in frappe.get_all("Trainer", fields=["name", "id", "first_name","last_name", "full_name", "expertise_in", "location", "age", "charge", "image"], filters={"name": ["in", trainers] if trainers else ["__invalid__"]}, ignore_permissions=True) %}
+            <div class="col-lg-6 col-12 mb-4 trainer-card">
+              <div class="card h-100">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                    <img src="{{ trainer.image }}" class="card-img" alt="{{ trainer.full_name }}">
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body h-100 d-flex flex-column">
+                      <h5 class="card-title">{{ trainer.first_name }} {{ trainer.last_name }}</h5>
+                      <div class="trainer-info">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>{{ trainer.expertise_in }}</span>
+                      </div>
+                      <div class="trainer-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ trainer.location }}</span>
+                      </div>
+                      <div class="trainer-info">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>{{ trainer.age }} years</span>
+                      </div>
+                      <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <div class="price-tag">₹{{ trainer.charge }}</div>
+                        <button class="btn btn-unlock" onclick="unlockTrainer('{{ frappe.session.user }}', '{{ trainer.name }}')">
+                          <i class="fas fa-unlock me-2"></i>Unlock Now for 10 credits
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- Unlocked Trainers Tab -->
+      <div class="tab-pane fade" id="unlockedTrainers">
+        <h2 class="section-title">Your Unlocked Trainers</h2>
+        <p class="mb-4">View detailed profiles and connect with trainers you've unlocked</p>
+        <div class="row trainer-list" id="unlockedTrainerList">
+          {% if not unlocked_trainers_data %}
+            <div class="col-12">
+              <div class="empty-state">
+                <i class="fas fa-lock"></i>
+                <h4>No trainers unlocked yet</h4>
+                <p>You haven't unlocked any trainers. Browse the All Trainers tab to find and unlock trainers.</p>
+              </div>
+            </div>
+          {% endif %}
+          {% for trainer in frappe.get_all("Trainer", fields=["name", "id", "first_name", "last_name" ,"full_name", "expertise_in", "location", "age", "charge", "image"], filters={"name": ["in", unlocked_trainers_data] if unlocked_trainers_data else ["__invalid__"]}, ignore_permissions=True) %}
+            <div class="col-lg-6 col-12 mb-4 trainer-card">
+              <div class="card h-100">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                    <img src="{{ trainer.image }}" class="card-img" alt="{{ trainer.full_name }}">
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body h-100 d-flex flex-column">
+                      <h5 class="card-title">{{ trainer.first_name }} {{ trainer.last_name }}</h5>
+                      <div class="trainer-info">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>{{ trainer.expertise_in }}</span>
+                      </div>
+                      <div class="trainer-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ trainer.location }}</span>
+                      </div>
+                      <div class="trainer-info">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>{{ trainer.age }} years</span>
+                      </div>
+                      <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <div class="price-tag">₹{{ trainer.charge }}</div>
+                        <a href="/trainer-profile?trainer_id={{ trainer.name }}" class="btn btn-primary btn-view">
+                          <i class="fas fa-eye me-2"></i>View Profile
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Tab switching functionality
+  var tabs = document.querySelectorAll(".nav-link");
+  tabs.forEach(tab => {
+    tab.addEventListener("click", function(e) {
+      e.preventDefault();
+      // Remove active class from all tabs
+      tabs.forEach(t => t.classList.remove("active"));
+      // Add active class to clicked tab
+      this.classList.add("active"); 
+      // Show the correct tab content
+      const targetId = this.getAttribute("href").substring(1);
+      document.querySelectorAll(".tab-pane").forEach(pane => {
+        pane.classList.remove("show", "active");
+      });
+      document.getElementById(targetId).classList.add("show", "active");
+    });
+  });
+  // Search functionality
+  document.getElementById("trainerSearch").addEventListener("input", function() {
+    let searchValue = this.value.toLowerCase();
+    document.querySelectorAll(".trainer-card").forEach(card => {
+      const cardContent = card.textContent.toLowerCase();
+      
+      if (cardContent.includes(searchValue)) {
+        card.style.display = "block";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  });
+});
+
+function makePayment(amount){
+  fetch(`http://trainer.localhost:8000/api/method/trainer.api.create_checkout_session?amount=${amount}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Frappe-CSRF-Token': frappe.csrf_token
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message.session_id && data.message.redirect_url) {
+      window.location.href = data.message.redirect_url;
+    } else {
+      alert("Failed to create payment session: " + (data.message.error || "Unknown error"));
+    }
+  })
+  .catch(error => {
+    console.error("Error creating payment session:", error);
+    alert("Failed to create payment session: " + error);
+  });
+}
+// Function to unlock trainer
+function unlockTrainer(user, trainerId) {
+  if (!user) {
+    alert("Please login to unlock trainers");
+    return;
+  }
+  // Show loading state
+  const button = event.target.closest('button');
+  const originalText = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Unlocking...';
+  button.disabled = true;
+  fetch(`http://trainer.localhost:8000/api/method/trainer.api.deduct_credits?user=${user}&trainer=${trainerId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Frappe-CSRF-Token': frappe.csrf_token
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message.message === "success") {
+      // Show success message with animation
+      button.innerHTML = '<i class="fas fa-check me-2"></i>Unlocked!';
+      button.classList.add('btn-success');
+      // Show a nice toast notification
+      const toastHTML = `
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+          <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+              <i class="fas fa-check-circle me-2"></i>
+              <strong class="me-auto">Success</strong>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              Trainer unlocked successfully! Switching to Unlocked Trainers tab.
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', toastHTML);
+      // Auto-dismiss toast after 3 seconds
+      setTimeout(() => {
+        document.querySelector('.toast').remove();
+      }, 3000);
+      // Switch to unlocked trainers tab after a short delay
+      setTimeout(() => {
+        document.getElementById('unlocked-trainers-tab').click();
+        location.reload(); // Refresh to update the unlocked trainers list
+      }, 1500);
+    } else {
+      // Show error state
+      button.innerHTML = '<i class="fas fa-times me-2"></i>Failed';
+      button.classList.add('btn-danger');
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.classList.remove('btn-danger');
+        button.disabled = false;
+      }, 2000);
+      alert("Failed to unlock trainer:  check for credits " );
+    }    //+ (data.message.error || "Unknown error")
+  })
+  .catch(error => {
+    console.error("Error unlocking trainer: ", error);
+    // Reset button state
+    button.innerHTML = originalText;
+    button.disabled = false;
+    alert("Please login to unlock trainers");
+  });
+}
+</script>
+{% endblock %}

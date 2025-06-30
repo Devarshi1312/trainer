@@ -1,0 +1,242 @@
+{
+ "actions": [],
+ "creation": "2025-02-26 16:13:20.744414",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "trainer",
+  "first_name",
+  "last_name",
+  "full_name",
+  "experience",
+  "city",
+  "rejection_reason",
+  "testimonials",
+  "training_approach",
+  "column_break_tjux",
+  "bio_line",
+  "expertise_in",
+  "dob",
+  "language",
+  "certificates",
+  "education",
+  "phone",
+  "client_worked",
+  "section_break_dmtv",
+  "avg_rating",
+  "charge",
+  "status",
+  "image",
+  "profile_views",
+  "section_break_owgp",
+  "workshop",
+  "section_break_igri",
+  "facebook",
+  "instagram",
+  "twitter",
+  "linkedin",
+  "personal_website"
+ ],
+ "fields": [
+  {
+   "fetch_from": "trainer.first_name",
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First_Name"
+  },
+  {
+   "fetch_from": "trainer.last_name",
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last_Name"
+  },
+  {
+   "fetch_from": "trainer.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full_Name",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "bio_line",
+   "fieldtype": "Text",
+   "label": "Bio_Line"
+  },
+  {
+   "fieldname": "expertise_in",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Expertise_In",
+   "options": "Trainer_Expertise",
+   "reqd": 1
+  },
+  {
+   "fieldname": "charge",
+   "fieldtype": "Float",
+   "label": "Charge"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach",
+   "label": "image"
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Data",
+   "label": "Language",
+   "options": "Trainer_Languages"
+  },
+  {
+   "fieldname": "experience",
+   "fieldtype": "Int",
+   "label": "Experience"
+  },
+  {
+   "fieldname": "rejection_reason",
+   "fieldtype": "Text",
+   "label": "Rejection_Reason"
+  },
+  {
+   "fieldname": "profile_views",
+   "fieldtype": "Int",
+   "label": "Profile_Views"
+  },
+  {
+   "fieldname": "avg_rating",
+   "fieldtype": "Float",
+   "label": "Avg_Rating"
+  },
+  {
+   "fieldname": "trainer",
+   "fieldtype": "Link",
+   "label": "Trainer",
+   "link_filters": "[[\"User\",\"role_user\",\"=\",\"Trainer\"]] \n",
+   "options": "User"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "testimonials",
+   "fieldtype": "Table",
+   "label": "Testimonials",
+   "options": "Testimonials"
+  },
+  {
+   "fieldname": "training_approach",
+   "fieldtype": "Text",
+   "label": "Training_Approach"
+  },
+  {
+   "fieldname": "column_break_tjux",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dob",
+   "fieldtype": "Data",
+   "label": "DOB"
+  },
+  {
+   "fieldname": "certificates",
+   "fieldtype": "Table",
+   "label": "Certificates",
+   "options": "Trainer_Certificates"
+  },
+  {
+   "fieldname": "education",
+   "fieldtype": "Table",
+   "label": "Education",
+   "options": "Trainer_Education"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Phone",
+   "label": "Phone"
+  },
+  {
+   "fieldname": "client_worked",
+   "fieldtype": "Table",
+   "label": "client_worked",
+   "options": "Clients_Worked"
+  },
+  {
+   "fieldname": "section_break_dmtv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_owgp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "workshop",
+   "fieldtype": "Table",
+   "label": "Workshop",
+   "options": "Trainer_Workshop_List"
+  },
+  {
+   "fieldname": "section_break_igri",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "facebook",
+   "fieldtype": "Data",
+   "label": "Facebook"
+  },
+  {
+   "fieldname": "instagram",
+   "fieldtype": "Data",
+   "label": "Instagram"
+  },
+  {
+   "fieldname": "twitter",
+   "fieldtype": "Data",
+   "label": "Twitter"
+  },
+  {
+   "fieldname": "linkedin",
+   "fieldtype": "Data",
+   "label": "LinkedIn"
+  },
+  {
+   "fieldname": "personal_website",
+   "fieldtype": "Data",
+   "label": "Personal_Website"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-06-30 11:36:34.749683",
+ "modified_by": "test@cumulations.com",
+ "module": "Trainer",
+ "name": "Trainer",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "first_name"
+}

@@ -1,0 +1,21 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+    <h2>Payment Successful!</h2>
+
+    {% if error %}
+        <p class="alert alert-danger">{{ error }}</p>
+    {% elif payment_details %}
+        <p>Thank you for your payment. Below are your transaction details:</p>
+
+        <div class="payment-details">
+            <p><strong>Transaction ID:</strong> {{ payment_details.transaction_id }}</p>
+            <p><strong>Amount Paid:</strong> {{ payment_details.amount_paid }} {{ payment_details.currency }}</p>
+            <p><strong>Credits Added:</strong> {{ payment_details.credits_added }}</p>
+            <p><strong>Payment Method:</strong> {{ payment_details.payment_method }}</p>
+            <p><strong>Your Email:</strong> {{ payment_details.customer_email }}</p>
+        </div>
+    {% else %}
+        <p class="alert alert-warning">Fetching payment details...</p>
+    {% endif %}
+{% endblock %}

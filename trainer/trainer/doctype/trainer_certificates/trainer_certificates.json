@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-20 11:08:22.028569",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "certificate_name",
+  "certificate_url",
+  "issued_by",
+  "issued_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "certificate_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Certificate_Name"
+  },
+  {
+   "fieldname": "certificate_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Certificate_Url"
+  },
+  {
+   "fieldname": "issued_by",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Issued_By"
+  },
+  {
+   "fieldname": "issued_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Issued_Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-03-20 11:09:33.897168",
+ "modified_by": "Administrator",
+ "module": "Trainer",
+ "name": "Trainer_Certificates",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

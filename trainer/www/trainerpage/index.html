@@ -1,0 +1,711 @@
+{%- extends "templates/web.html" -%}
+
+{% block head_include %}
+<style>
+  /* Core styles matching ThoughtBulb's design */
+  :root {
+    --primary-color: #36b37e;
+    --secondary-color: #2684ff;
+    --accent-color: #ff5630;
+    --light-gray: #f4f5f7;
+    --text-dark: #172b4d;
+    --text-light: #6b778c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --border-radius: 8px;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    background-color: #f9fafb;
+  }
+  
+  /* Hero section */
+  .hero-section {
+    background-color: white;
+    padding: 3rem 0;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+  }
+  
+  .hero-section p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+  }
+  
+  .credits-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+  }
+  
+  .credits-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #EBF5FF;
+    color: var(--secondary-color);
+    margin: 1.5rem;
+    padding:1.25rem;
+    border-radius: 30px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .credits-badge i {
+    color: #FFAB00;
+  }
+  
+  /* Filters and search */
+  .filters-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-container {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  
+  .search-container input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #e0e0e0;
+    font-size: 1rem;
+  }
+  
+  .search-container i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+  }
+  
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .filter-tabs .nav-link {
+    border: 1px solid #e0e0e0;
+    border-radius: 30px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    color: var(--text-light);
+    white-space: nowrap;
+  }
+  
+  .filter-tabs .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
+  /* Trainer cards */
+  .trainers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .trainer-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .trainer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .trainer-img-container {
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .trainer-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .trainer-details {
+    padding: 1.25rem;
+  }
+  
+  .trainer-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-dark);
+  }
+  
+  .trainer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+  
+  .trainer-info i {
+    color: var(--primary-color);
+    width: 18px;
+  }
+  
+  .action-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+  }
+  
+  .price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 30px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2f9d6a;
+    transform: translateY(-2px);
+  }
+  
+  .btn-outline {
+    background-color: white;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 30px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  /* Badges */
+  .expertise-badge {
+    display: inline-block;
+    background-color: rgba(54, 179, 126, 0.1);
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 30px;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Empty states */
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: #d0d5dd;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+  }
+  
+  .empty-state p {
+    color: var(--text-light);
+  }
+  
+  /* Buy credits form */
+  .buy-credits-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .buy-credits-form input {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #e0e0e0;
+  }
+  
+  .buy-credits-form button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+  }
+
+  .card {
+      max-width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+      margin: 20px auto;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e0e4e9 100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      background: #4a69bd;
+      color: white;
+      padding: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+    }
+    
+    .card-body {
+      width: auto;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .credits-text {
+      font-size: 18px;
+      margin-bottom: 25px;
+      color: #2c3e50;
+      line-height: 1.5;
+    }
+    
+    .buy-credits-btn {
+      display: inline-block;
+      background: #4a69bd;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .buy-credits-btn:hover {
+      background: #3d56a6;
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(74, 105, 189, 0.4);
+    }
+    
+    .coin-icon {
+      margin-right: 8px;
+    }
+  
+  /* Section headers */
+  .section-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .section-subtitle {
+    color: var(--text-light);
+  }
+  
+  /* Toast notifications */
+  .toast {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  
+  .toast-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .toast-success .toast-header {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .toast-error .toast-header {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  .toast-body {
+    padding: 1rem;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 2rem 0;
+    }
+    
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+    
+    .trainers-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row" style="display: flex;">
+      <div class="col-md-8">
+        <h1>Find Your Perfect Trainer</h1>
+        <p>Discover expert trainers who can help you achieve your fitness and wellness goals</p>
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input type="text" id="trainerSearch" placeholder="Search trainers by name, expertise, or location...">
+        </div>
+      </div> 
+      <div class="card">
+        <div class="card-header">
+          Premium Credits
+        </div>
+        <div class="card-body">
+          <p class="credits-text">
+            Unlock premium features and enhance your experience by purchasing credits. Get access to exclusive content and advanced features!
+          </p>
+          <a href="/plans" class="buy-credits-btn">
+            <i class="fas fa-coins coin-icon"></i>
+            Want to buy credits? Click here!
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content -->
+<div class="container py-5">
+  <div class="row">
+    <!-- Left Sidebar -->
+    <div class="col-lg-3 col-md-4 mb-4">
+      <!-- Credits Section -->
+      <div class="credits-container">
+        <div class="credits-badge">
+          <i class="fas fa-coins"></i>
+          <span>Your Credits: {{credits}}</span>
+        </div>
+      </div>
+      
+      <!-- Filters Section -->
+      <div class="filters-container">
+        <h5 class="mb-3">View Options</h5>
+        <ul class="nav flex-column filter-tabs" id="trainerTabs">
+          <li class="nav-item">
+            <a class="nav-link active" id="all-trainers-tab" data-bs-toggle="tab" href="#allTrainers">
+              <i class="fas fa-users me-2"></i>All Trainers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="unlocked-trainers-tab" data-bs-toggle="tab" href="#unlockedTrainers">
+              <i class="fas fa-unlock me-2"></i>Unlocked Trainers
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-lg-9 col-md-8">
+      <!-- Trainers Content -->
+      <div class="tab-content">
+        <!-- All Trainers Tab -->
+        <div class="tab-pane fade show active" id="allTrainers">
+          <div class="section-header">
+            <h2 class="section-title">Available Trainers</h2>
+            <p class="section-subtitle">Browse our selection of professional trainers and unlock access to their profiles</p>
+          </div>
+          
+          <!-- Trainers Grid -->
+          <div class="trainers-grid">
+            {% if not trainers %}
+              <div class="empty-state">
+                <i class="fas fa-user-slash"></i>
+                <h4>No trainers found</h4>
+                <p>We couldn't find any trainers matching your criteria. Please try again later.</p>
+              </div>
+            {% endif %}
+            
+            {% for trainer in frappe.get_all("Trainer", fields=["name", "id", "first_name","last_name", "full_name", "expertise_in", "location", "age", "charge", "image"], filters={"name": ["in", trainers] if trainers else ["__invalid__"]}, ignore_permissions=True) %}
+              <div class="trainer-card">
+                <div class="trainer-img-container">
+                  <img src="{{ trainer.image }}" class="trainer-img" alt="{{ trainer.full_name }}">
+                </div>
+                <div class="trainer-details">
+                  <div class="expertise-badge">{{ trainer.expertise_in }}</div>
+                  <h3 class="trainer-name">{{ trainer.first_name }} {{ trainer.last_name }}</h3>
+                  <div class="trainer-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ trainer.location }}</span>
+                  </div>
+                  <div class="trainer-info">
+                    <i class="fas fa-birthday-cake"></i>
+                    <span>{{ trainer.age }} years</span>
+                  </div>
+                  <div class="action-container">
+                    <div class="price">₹{{ trainer.charge }}</div>
+                    <button class="btn btn-primary" onclick="unlockTrainer('{{ frappe.session.user }}', '{{ trainer.name }}')">
+                      <i class="fas fa-unlock me-1"></i>Unlock (10 credits)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Unlocked Trainers Tab -->
+        <div class="tab-pane fade" id="unlockedTrainers">
+          <div class="section-header">
+            <h2 class="section-title">Your Unlocked Trainers</h2>
+            <p class="section-subtitle">View detailed profiles and connect with trainers you've unlocked</p>
+          </div>
+          
+          <!-- Unlocked Trainers Grid -->
+          <div class="trainers-grid">
+            {% if not unlocked_trainers_data %}
+              <div class="empty-state">
+                <i class="fas fa-lock"></i>
+                <h4>No trainers unlocked yet</h4>
+                <p>You haven't unlocked any trainers. Browse the All Trainers tab to find and unlock trainers.</p>
+              </div>
+            {% endif %}
+            
+            {% for trainer in frappe.get_all("Trainer", fields=["name", "id", "first_name", "last_name" ,"full_name", "expertise_in", "location", "age", "charge", "image"], filters={"name": ["in", unlocked_trainers_data] if unlocked_trainers_data else ["__invalid__"]}, ignore_permissions=True) %}
+              <div class="trainer-card">
+                <div class="trainer-img-container">
+                  <img src="{{ trainer.image }}" class="trainer-img" alt="{{ trainer.full_name }}">
+                </div>
+                <div class="trainer-details">
+                  <div class="expertise-badge">{{ trainer.expertise_in }}</div>
+                  <h3 class="trainer-name">{{ trainer.first_name }} {{ trainer.last_name }}</h3>
+                  <div class="trainer-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ trainer.location }}</span>
+                  </div>
+                  <div class="trainer-info">
+                    <i class="fas fa-birthday-cake"></i>
+                    <span>{{ trainer.age }} years</span>
+                  </div>
+                  <div class="action-container">
+                    <div class="price">₹{{ trainer.charge }}</div>
+                    <a href="/trainer-profile?trainer_id={{ trainer.name }}" class="btn btn-outline">
+                      <i class="fas fa-eye me-1"></i>View Profile
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Tab switching functionality
+  var tabs = document.querySelectorAll(".nav-link");
+  tabs.forEach(tab => {
+    tab.addEventListener("click", function(e) {
+      e.preventDefault();
+      // Remove active class from all tabs
+      tabs.forEach(t => t.classList.remove("active"));
+      // Add active class to clicked tab
+      this.classList.add("active"); 
+      // Show the correct tab content
+      const targetId = this.getAttribute("href").substring(1);
+      document.querySelectorAll(".tab-pane").forEach(pane => {
+        pane.classList.remove("show", "active");
+      });
+      document.getElementById(targetId).classList.add("show", "active");
+    });
+  });
+  
+  // Search functionality
+  document.getElementById("trainerSearch").addEventListener("input", function() {
+    let searchValue = this.value.toLowerCase();
+    const activeTab = document.querySelector(".tab-pane.active");
+    
+    activeTab.querySelectorAll(".trainer-card").forEach(card => {
+      const cardContent = card.textContent.toLowerCase();
+      
+      if (cardContent.includes(searchValue)) {
+        card.style.display = "block";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  });
+});
+
+function makePayment(amount){
+  fetch(`http://trainer.localhost:8000/api/method/trainer.api.create_checkout_session?amount=${amount}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Frappe-CSRF-Token': frappe.csrf_token
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message.session_id && data.message.redirect_url) {
+      window.location.href = data.message.redirect_url;
+    } else {
+      showToast("Error", "Failed to create payment session: " + (data.message.error || "Unknown error"), "error");
+    }
+  })
+  .catch(error => {
+    console.error("Error creating payment session:", error);
+    showToast("Error", "Failed to create payment session", "error");
+  });
+}
+
+// Function to unlock trainer
+function unlockTrainer(user, trainerId) {
+  if (!user) {
+    showToast("Error", "Please login to unlock trainers", "error");
+    return;
+  }
+  
+  // Show loading state
+  const button = event.target.closest('button');
+  const originalText = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Unlocking...';
+  button.disabled = true;
+  
+  fetch(`http://trainer.localhost:8000/api/method/trainer.api.deduct_credits?user=${user}&trainer=${trainerId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Frappe-CSRF-Token': frappe.csrf_token
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message.message === "success") {
+      // Show success message with animation
+      button.innerHTML = '<i class="fas fa-check me-1"></i>Unlocked!';
+      button.classList.add('btn-success');
+      
+      // Show success toast
+      showToast("Success", "Trainer unlocked successfully! Switching to Unlocked Trainers tab.", "success");
+      
+      // Switch to unlocked trainers tab after a short delay
+      setTimeout(() => {
+        document.getElementById('unlocked-trainers-tab').click();
+        location.reload(); // Refresh to update the unlocked trainers list
+      }, 1500);
+    } else {
+      // Show error state
+      button.innerHTML = '<i class="fas fa-times me-1"></i>Failed';
+      button.classList.add('btn-danger');
+      
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.classList.remove('btn-danger');
+        button.disabled = false;
+      }, 2000);
+      
+      showToast("Error", "Insufficient credits to unlock this trainer", "error");
+    }
+  })
+  .catch(error => {
+    console.error("Error unlocking trainer: ", error);
+    // Reset button state
+    button.innerHTML = originalText;
+    button.disabled = false;
+    showToast("Error", "Please login to unlock trainers", "error");
+  });
+}
+
+// Helper function to show toast notifications
+function showToast(title, message, type) {
+  const toastId = 'toast-' + Date.now();
+  const toastHTML = `
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+      <div id="${toastId}" class="toast toast-${type} show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+          <strong class="me-auto">${title}</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', toastHTML);
+  
+  // Auto-dismiss toast after 3 seconds
+  setTimeout(() => {
+    const toastElement = document.getElementById(toastId);
+    if (toastElement) {
+      toastElement.remove();
+    }
+  }, 3000);
+}
+document.querySelector('.buy-credits-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Redirect to payment page
+      window.location.href = "/plans";
+    });
+</script>
+{% endblock %}

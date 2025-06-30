@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-20 11:05:21.876408",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "users",
+  "trainers"
+ ],
+ "fields": [
+  {
+   "fieldname": "users",
+   "fieldtype": "Link",
+   "label": "Users",
+   "link_filters": "[[\"User\",\"role_user\",\"=\",\"user_role\"]] \n",
+   "options": "User"
+  },
+  {
+   "fieldname": "trainers",
+   "fieldtype": "Link",
+   "label": "Trainers",
+   "options": "Trainer"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-28 12:13:27.089782",
+ "modified_by": "Administrator",
+ "module": "Trainer",
+ "name": "Wishlist",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
