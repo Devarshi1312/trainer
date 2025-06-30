@@ -103,47 +103,6 @@ def payment_success(session_id):
         return {"status": "failed", "message": "An error occurred."}
 
 
-@frappe.whitelist(allow_guest=True)
-def signup_trainer(email, first_name, password, last_name=None, roles=None):
-    if not email or not first_name or not password:
-        return {"status": "error", "message": "Email, First Name, and Password are required"}
-
-    # Check if the user already exists
-    existing_user = frappe.get_all("User", filters={"email": email})
-    if existing_user:
-        return {"status": "error", "message": "User with this email already exists"}
-    if roles==None:
-        roles=["Trainer"]
-    # Create a new user document
-    user_doc = frappe.get_doc({
-        "doctype": "User",
-        "email": email,
-        "first_name": first_name,
-	    "last_name":last_name,
-        "enabled": 1,
-        "role_user": "Trainer",
-        "new_password": password,
-        "roles": [{"role": role} for role in roles],
-    })
-
-    try:
-        # Insert the user document into the database
-        user_doc.insert(ignore_permissions=True)
-
-        update_password(user=email, pwd=password)
-
-        # Send welcome email or other post-signup actions can be triggered here.
-        #if user_doc:
-        #	generate_otp(email)
-#            subject="Welcome to our Platform",
-#            message="Hello, {}! Welcome to our platform.".format(first_name)
-#        )
-        
-        return {"status": "success", "message": "User created successfully", "user": user_doc, "key_details":generate_key(email)}
-
-    except Exception as e:
-        frappe.log_error(f"Error creating user: {str(e)}", "Custom Signup Error")
-        return {"status": "error", "message": "Error creating user: {}".format(str(e))}
 
 @frappe.whitelist(allow_guest=True)
 def signup_User(email, first_name, password, last_name=None, roles=None):
@@ -154,8 +113,10 @@ def signup_User(email, first_name, password, last_name=None, roles=None):
     existing_user = frappe.get_all("User", filters={"email": email})
     if existing_user:
         return {"status": "error", "message": "User with this email already exists"}
-    if roles==None:
-        roles=["user_role"]
+    if "user_role" in roles:
+        role="user_role"
+    elif "Trainer" in roles:
+        role="Trainer"
     # Create a new user document
     user_doc = frappe.get_doc({
         "doctype": "User",
@@ -163,7 +124,7 @@ def signup_User(email, first_name, password, last_name=None, roles=None):
         "first_name": first_name,
 	    "last_name":last_name,
         "enabled": 1,
-        "role_user": "user_role",
+        "role_user": role,
         "new_password": password,
         "roles": [{"role": role} for role in roles],
     })
@@ -561,13 +522,29 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
     """
 
     # Optionally add total count for frontend pagination UI
-    count_query = f"""
-        SELECT COUNT(*) as total FROM tabTrainer t WHERE {where_clause}
-    """
+    trainers = frappe.db.sql(query, params, as_dict=True)
+
+    # Optional: get total count for pagination
+    count_query = f"""SELECT COUNT(*) as total FROM tabTrainer t WHERE {where_clause}"""
     total_count = frappe.db.sql(count_query, params, as_dict=True)[0]["total"]
 
+    # Wishlist logic: Get all trainer names in user's wishlist
+    user = frappe.session.user
+    wishlisted = set()
+    if user and user != "Guest":
+        wishlist_entries = frappe.get_all(
+            "Wishlist",
+            filters={"user": user},
+            fields=["trainer"]
+        )
+        wishlisted = {entry.trainer for entry in wishlist_entries}
+
+    # Append is_wishlisted flag
+    for trainer in trainers:
+        trainer["is_wishlisted"] = trainer["name"] in wishlisted
+
     frappe.response["data"] = {
-        "results": frappe.db.sql(query, params, as_dict=True),
+        "results": trainers,
         "total": total_count,
         "page": page,
         "page_size": page_size,
