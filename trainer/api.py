@@ -406,6 +406,13 @@ def create_order(amount):
         frappe.log_error(frappe.get_traceback(), "Razorpay Order Creation Failed")
         return {"status": "error", "message": str(e)}
 
+def get_razorpay_client():
+    import razorpay
+    key_id = frappe.conf.get("razorpay_key_id")
+    key_secret = frappe.conf.get("razorpay_key_secret")
+    if not key_id or not key_secret:
+        frappe.throw("Razorpay credentials missing")
+    return razorpay.Client(auth=(key_id, key_secret))
 
 @frappe.whitelist(allow_guest=True)
 def verify_payment_and_update_credits(razorpay_payment_id, razorpay_order_id, razorpay_signature):
@@ -439,7 +446,7 @@ def verify_payment_and_update_credits(razorpay_payment_id, razorpay_order_id, ra
         user = frappe.session.user
         amount_in_paise = int(payment["amount"])
         amount_in_inr = amount_in_paise / 100
-        credits_to_add = amount_in_paise // 50  # You can change conversion logic here
+        credits_to_add = amount_in_inr // 5  # You can change conversion logic here
 
         # Get or create Credits Doc
         user_doc = frappe.get_all("Credits", filters={"user": user}, fields=["name", "credits"])
@@ -472,7 +479,7 @@ def verify_payment_and_update_credits(razorpay_payment_id, razorpay_order_id, ra
 
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Razorpay Payment Verification Failed")
-        return {"status": "failed", "message": "An error occurred during payment verification."}
+        return {"status": "failed", "message": "An error occurred during payment verification.","error":e}
 
 @frappe.whitelist(allow_guest=True)
 def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=10):
