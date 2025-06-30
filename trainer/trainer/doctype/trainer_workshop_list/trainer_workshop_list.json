@@ -38,10 +38,9 @@
   },
   {
    "fieldname": "format",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Format",
-   "options": "Virtual\nIn-Person"
+   "label": "Format"
   },
   {
    "fieldname": "image",
@@ -66,7 +65,7 @@
    "fieldname": "type",
    "fieldtype": "Select",
    "label": "Type",
-   "options": "CaseStudy\nWorkshop"
+   "options": "Casestudy\nWorkshop"
   },
   {
    "fieldname": "outcomes",
@@ -87,7 +86,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-30 12:21:15.524357",
+ "modified": "2025-06-30 13:46:09.680479",
  "modified_by": "test@cumulations.com",
  "module": "Trainer",
  "name": "Trainer_Workshop_List",
