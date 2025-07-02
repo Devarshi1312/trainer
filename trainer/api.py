@@ -555,7 +555,7 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
         "total": total_count,
         "page": page,
         "page_size": page_size,
-        "total_pages": (total_count + page_size - 1) // page_size,
+        "total_pages": (total_count + page_size - 1) // page_size
     }
 
 @frappe.whitelist(allow_guest=True)

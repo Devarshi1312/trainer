@@ -13,7 +13,6 @@
    "fieldname": "users",
    "fieldtype": "Link",
    "label": "Users",
-   "link_filters": "[[\"User\",\"role_user\",\"=\",\"user_role\"]] \n",
    "options": "User"
   },
   {
@@ -25,8 +24,8 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-28 12:13:27.089782",
- "modified_by": "Administrator",
+ "modified": "2025-07-02 10:37:39.859230",
+ "modified_by": "test@cumulations.com",
  "module": "Trainer",
  "name": "Wishlist",
  "owner": "Administrator",
@@ -44,6 +43,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
