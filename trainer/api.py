@@ -210,6 +210,7 @@ def get_all_trainers(user, page=1, page_size=10):
 	    t.experience,
 	    t.expertise_in,
 	    t.language,
+	    t.profile_views,
             CASE 
                 WHEN w.trainers IS NOT NULL THEN 1 
                 ELSE 0 
@@ -285,7 +286,19 @@ def get_all_trainers(user, page=1, page_size=10):
 
     # Get total count for pagination
     total_count = frappe.db.count("Trainer")
+    for trainer in trainers:
+        reviews = frappe.get_all(
+            "Ratings_Reviews",
+            filters={"trainers": trainer.name},
+            fields=["users", "user_name", "review", "rating","trainers"]
+        )
 
+        # Calculate average rating
+        avg_rating = 0.0
+        if reviews:
+            total = sum([r.rating for r in reviews])
+            avg_rating = round(total / len(reviews), 1)
+        trainer["avg_rating"] = avg_rating
     return {
         "total": total_count,
         "page": page,
@@ -549,7 +562,19 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
     # Append is_wishlisted flag
     for trainer in trainers:
         trainer["is_wishlisted"] = 1 if trainer["name"] in wishlisted else 0
+    for trainer in trainers:
+        reviews = frappe.get_all(
+            "Ratings_Reviews",
+            filters={"trainers": trainer.name},
+            fields=["users", "user_name", "review", "rating","trainers"]
+        )
 
+        # Calculate average rating
+        avg_rating = 0.0
+        if reviews:
+            total = sum([r.rating for r in reviews])
+            avg_rating = round(total / len(reviews), 1)
+        trainer["avg_rating"] = avg_rating
     frappe.response["data"] = {
         "results": trainers,
         "total": total_count,
