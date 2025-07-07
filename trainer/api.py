@@ -533,7 +533,7 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
     where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
 
     query = f"""
-        SELECT DISTINCT t.name, t.full_name, t.avg_rating, t.expertise_in, t.experience,
+        SELECT DISTINCT t.name,t.first_name, t.full_name, t.avg_rating, t.expertise_in, t.experience,
                t.city, t.charge, t.profile_views, t.status, t.image, t.language
         FROM tabTrainer t
         WHERE {where_clause}
