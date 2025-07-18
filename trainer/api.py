@@ -6,6 +6,28 @@ import hmac
 import hashlib
 import razorpay
 from frappe.utils import now
+import requests
+from frappe import _
+
+@frappe.whitelist(allow_guest=True)
+def verify_captcha(token):
+    """Verify Google reCAPTCHA token"""
+    if not token:
+        frappe.response["data"]={"success":False,"message":"Token is missing"}
+        return
+    secret_key = "6LdlancrAAAAAMlrgRQnIJU3z5lQgq6L-fM_KEd6"
+    verify_url = "https://www.google.com/recaptcha/api/siteverify"
+
+    resp = requests.post(verify_url, data={
+        "secret": secret_key,
+        "response": token
+    }).json()
+
+    if not resp.get("success"):
+        frappe.response["data"] = {"success":False,"message":"Captcha validation failed"}
+        return
+    frappe.response["data"] = {"success": True}
+    return
 
 @frappe.whitelist(allow_guest=False)
 def deduct_credits(user,trainer):
@@ -198,10 +220,8 @@ def get_all_trainers(user, page=1, page_size=10):
     query = """
         SELECT 
             t.trainer,
-            t.full_name, 
             t.name,
             t.first_name,
-            t.last_name, 
             t.cover_image, 
             t.image, 
             t.avg_rating,
@@ -495,7 +515,7 @@ def verify_payment_and_update_credits(razorpay_payment_id, razorpay_order_id, ra
         return {"status": "failed", "message": "An error occurred during payment verification.","error":e}
 
 @frappe.whitelist(allow_guest=True)
-def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=10):
+def global_trainer_search(search_text=None,category=None, city_filter=None, page=1, page_size=10):
     params = {}
     where_conditions = []
 
@@ -529,6 +549,9 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
     if city_filter:
         params["city"] = city_filter
         where_conditions.append("LOWER(t.city) = LOWER(%(city)s)")
+    if category:
+        params["category"] = f"%{category}%"
+        where_conditions.append("LOWER(t.expertise_in) LIKE LOWER(%(category)s)")
 
     where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
 
@@ -562,6 +585,19 @@ def global_trainer_search(search_text=None, city_filter=None, page=1, page_size=
     # Append is_wishlisted flag
     for trainer in trainers:
         trainer["is_wishlisted"] = 1 if trainer["name"] in wishlisted else 0
+    # Get unlocked trainers for the current user
+    unlocked_trainers = frappe.db.get_all(
+        "Unlocked Trainers",
+        filters={"user": user},
+        fields=["*"]
+    )
+    unlocked_trainer_ids = {entry["trainer"] for entry in unlocked_trainers}
+
+    # Mark trainers as wishlisted and unlocked
+    for trainer in trainers:
+        trainer_id = trainer["name"]  # Use 'name' instead of 'trainer'
+        trainer["is_unlocked"] = 1 if trainer_id in unlocked_trainer_ids else 0
+
     for trainer in trainers:
         reviews = frappe.get_all(
             "Ratings_Reviews",
@@ -606,6 +642,7 @@ def company_trainers(user, page=1, page_size=8):
 	    t.expertise_in,
 	    t.experience,
 	    t.language,
+	    t.profile_views,
             CASE
                 WHEN w.trainers IS NOT NULL THEN 1
                 ELSE 0
@@ -618,7 +655,6 @@ def company_trainers(user, page=1, page_size=8):
         LEFT JOIN tabWishlist w ON w.trainers = t.trainer AND w.users = %(user)s
         LEFT JOIN `tabUnlocked Trainers` u ON u.trainer = t.trainer AND u.user = %(user)s
         ORDER BY t.avg_rating DESC
-        LIMIT %(start)s, %(page_size)s
     """
 
     trainers = frappe.db.sql(
@@ -683,9 +719,6 @@ def company_trainers(user, page=1, page_size=8):
     total_count = frappe.db.count("Trainer")
 
     return {
-        "total": total_count,
-        "page": page,
-        "page_size": page_size,
         "unlocked_trainers": unlocked,
         "wishlist_trainers": wishlist
     }
@@ -718,7 +751,7 @@ def get_trainer(trainer_id):
     trainer_data = {
         "name": trainer_doc.name,
         "trainer": trainer_doc.trainer,
-        "full_name": trainer_doc.full_name,
+        "full_name": trainer_doc.first_name,
         "bio_line": trainer_doc.bio_line,
         "experience": trainer_doc.experience,
         "city": trainer_doc.city,
@@ -776,7 +809,10 @@ def get_trainer(trainer_id):
         "personal_website": trainer_doc.personal_website,
         "is_unlocked": 1
     }
-
+    trainer = frappe.get_doc("Trainer", trainer_id)
+    trainer.profile_views = int(trainer.profile_views or 0) + 1
+    trainer.save(ignore_permissions=True)
+    frappe.db.commit()
     #frappe.response["message"] = "Trainer profile fetched successfully"
     frappe.response["data"] = trainer_data
 
@@ -818,7 +854,7 @@ def get_trainer_profile(trainer_id):
     trainer_data = {
         "name": trainer_doc.name,
         "trainer": trainer_doc.trainer,
-        "full_name": trainer_doc.full_name,
+        "full_name": trainer_doc.first_name,
         "bio_line": trainer_doc.bio_line,
         "experience": trainer_doc.experience,
         "city": trainer_doc.city,
@@ -866,6 +902,7 @@ def get_trainer_profile(trainer_id):
 
     if is_unlocked:
         trainer_data.update({
+	    "full_name":trainer_doc.full_name,
             "phone": trainer_doc.phone,
             "facebook": trainer_doc.facebook,
             "instagram": trainer_doc.instagram,
@@ -873,6 +910,9 @@ def get_trainer_profile(trainer_id):
             "linkedin": trainer_doc.linkedin,
             "personal_website": trainer_doc.personal_website,
         })
-
+    trainer = frappe.get_doc("Trainer", trainer_id)
+    trainer.profile_views = int(trainer.profile_views or 0) + 1
+    trainer.save(ignore_permissions=True)
+    frappe.db.commit()
     #frappe.response["message"] = "Trainer public profile fetched"
     frappe.response["data"] = trainer_data
