@@ -8,6 +8,7 @@ import razorpay
 from frappe.utils import now
 import requests
 from frappe import _
+import yagmail
 
 @frappe.whitelist(allow_guest=True)
 def verify_captcha(token):
@@ -15,7 +16,7 @@ def verify_captcha(token):
     if not token:
         frappe.response["data"]={"success":False,"message":"Token is missing"}
         return
-    secret_key = "6LdlancrAAAAAMlrgRQnIJU3z5lQgq6L-fM_KEd6"
+    secret_key = "6LeUq4crAAAAAFIyrm-2e2Vpq5XVWaSMH7n-k1rb"
     verify_url = "https://www.google.com/recaptcha/api/siteverify"
 
     resp = requests.post(verify_url, data={
@@ -916,3 +917,28 @@ def get_trainer_profile(trainer_id):
     frappe.db.commit()
     #frappe.response["message"] = "Trainer public profile fetched"
     frappe.response["data"] = trainer_data
+
+@frappe.whitelist(allow_guest=True)
+def send_support_email(email, text, name):
+    try:
+        yag = yagmail.SMTP("devarshi.b@cumulations.com", "djxb pjtf knol niud")
+        headers = {}
+
+        if email:
+            headers["Reply-To"] = email
+
+        yag.send(
+            to=['devarshi.b@cumulations.com'],
+            subject='Support Request for Get Pros.',
+            contents=f"""
+                <span><strong>Username:</strong> {name}</span><br>
+                <span><strong>Email:</strong> {email}</span><br>
+                <span><strong>Support Request:</strong> {text}</span>
+            """,
+            headers=headers
+        )
+
+        return {"success": True, "message": "Support email sent successfully."}
+
+    except Exception as e:
+        frappe.throw(f"Failed to send support email. Reason: {str(e)}")
