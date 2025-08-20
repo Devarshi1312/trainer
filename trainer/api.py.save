@@ -1,7 +1,4 @@
-import random
 import frappe
-from datetime import datetime, timedelta ,date
-import string
 import stripe
 from frappe.auth import LoginManager
 from frappe.utils.password import update_password
@@ -12,7 +9,6 @@ from frappe.utils import now
 import requests
 from frappe import _
 import yagmail
-from frappe.core.doctype.user.user import reset_password
 
 @frappe.whitelist(allow_guest=True)
 def verify_captcha(token):
@@ -247,7 +243,7 @@ def get_all_trainers(user, page=1, page_size=10):
         FROM tabTrainer t
         LEFT JOIN tabWishlist w ON w.trainers = t.trainer AND w.users = %(user)s
         LEFT JOIN `tabUnlocked Trainers` u ON u.trainer = t.trainer AND u.user = %(user)s
-	WHERE t.status = 'Approved'
+	
         ORDER BY t.avg_rating DESC
         LIMIT %(start)s, %(page_size)s
     """
@@ -352,7 +348,7 @@ def search_trainers(search_text=None, location=None, expertise=None, sort_by="ra
             GROUP_CONCAT(DISTINCT e.expertise ORDER BY e.expertise SEPARATOR ', ') AS expertise
         FROM tabTrainer t
         LEFT JOIN tabExpertise e ON e.trainer = t.name
-        WHERE t.status = 'Approved'
+        WHERE 1=1
     """
     
     filters = {}
@@ -558,7 +554,7 @@ def global_trainer_search(search_text=None,category=None, city_filter=None, page
     if category:
         params["category"] = f"%{category}%"
         where_conditions.append("LOWER(t.expertise_in) LIKE LOWER(%(category)s)")
-    where_conditions.append("t.status = 'Approved'")
+
     where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
 
     query = f"""
@@ -660,7 +656,6 @@ def company_trainers(user, page=1, page_size=8):
         FROM tabTrainer t
         LEFT JOIN tabWishlist w ON w.trainers = t.trainer AND w.users = %(user)s
         LEFT JOIN `tabUnlocked Trainers` u ON u.trainer = t.trainer AND u.user = %(user)s
-	WHERE t.status = 'Approved'
         ORDER BY t.avg_rating DESC
     """
 
@@ -948,63 +943,3 @@ def send_support_email(email, text, name):
 
     except Exception as e:
         frappe.throw(f"Failed to send support email. Reason: {str(e)}")
-@frappe.whitelist(allow_guest=True)
-def generate_otp(email):
-    otp = ''.join(random.choices(string.digits, k=4))
-    expiry_time = datetime.now() + timedelta(minutes=10)  # OTP valid for 5 minutes
-
-    # Save OTP in the database
-    frappe.get_doc({
-        'doctype': 'OTP_MANAGEMENT',
-        'email': email,
-        'otp': otp,
-        'expiry_time': expiry_time
-    }).insert(ignore_permissions=True)
-
-    # Send OTP via email
-    send_otp_email(email, otp)
-    return("OTP sent successfully")
-
-def send_otp_email(email, otp):
-    yag = yagmail.SMTP("devarshi.b@cumulations.com", "djxb pjtf knol niud")
-    yag.send(to=email, subject="OTP for Bandan", contents=f"OTP for is {otp} and valid for 10 min")
-
-@frappe.whitelist(allow_guest = True)
-def verify_otp(email, entered_otp):
-    # Fetch OTP details from the database
-    otp_doc = frappe.get_all('OTP_MANAGEMENT', filters={'email': email}, fields=['otp', 'expiry_time', 'name'], order_by="creation desc", limit_page_length=1)
-    if not otp_doc:
-        return {'status': 'failure', 'message': 'OTP not found'}
-
-    otp_data = otp_doc[0]
-#   print(otp_data)
-    if datetime.now() > otp_data['expiry_time']:
-        frappe.delete_doc('OTP_MANAGEMENT', otp_data['name'],ignore_permissions=True)
-        return {'status': 'failure', 'message': 'OTP has expired'}
-
-    if entered_otp != otp_data['otp']:
-        return {'status': 'failure', 'message': 'Invalid OTP'}
-    
-    frappe.delete_doc('OTP_MANAGEMENT', otp_data['name'],ignore_permissions=True)
-
-    return {'status': 'success', 'message': 'OTP verified successfully'}
-
-
-@frappe.whitelist(allow_guest=True)
-def reset_password(email, new_password):
-    """Directly reset a user's password without sending reset email"""
-    if not email or not new_password:
-        return {"status": "error", "message": "Email and new password are required"}
-
-    user = frappe.db.get_value("User", {"email": email})
-    if not user:
-        return {"status": "error", "message": "User not found"}
-
-    try:
-        # This directly updates the password in Frappe DB
-        update_password(user, new_password)
-        frappe.db.commit()
-        return {"status": "success", "message": "Password has been reset successfully"}
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Direct Password Reset API Error")
-        return {"status": "error", "message": str(e)}
