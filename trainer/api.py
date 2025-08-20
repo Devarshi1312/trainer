@@ -16,7 +16,7 @@ def verify_captcha(token):
     if not token:
         frappe.response["data"]={"success":False,"message":"Token is missing"}
         return
-    secret_key = "6LeUq4crAAAAAFIyrm-2e2Vpq5XVWaSMH7n-k1rb"
+    secret_key = "6Lcb7pYrAAAAALZ6Pp58zICAq_JCv8wOFxTrqnq9"
     verify_url = "https://www.google.com/recaptcha/api/siteverify"
 
     resp = requests.post(verify_url, data={
@@ -243,6 +243,7 @@ def get_all_trainers(user, page=1, page_size=10):
         FROM tabTrainer t
         LEFT JOIN tabWishlist w ON w.trainers = t.trainer AND w.users = %(user)s
         LEFT JOIN `tabUnlocked Trainers` u ON u.trainer = t.trainer AND u.user = %(user)s
+	WHERE t.status = 'Approved'
         ORDER BY t.avg_rating DESC
         LIMIT %(start)s, %(page_size)s
     """
@@ -347,7 +348,7 @@ def search_trainers(search_text=None, location=None, expertise=None, sort_by="ra
             GROUP_CONCAT(DISTINCT e.expertise ORDER BY e.expertise SEPARATOR ', ') AS expertise
         FROM tabTrainer t
         LEFT JOIN tabExpertise e ON e.trainer = t.name
-        WHERE 1=1
+        WHERE t.status = 'Approved'
     """
     
     filters = {}
@@ -553,7 +554,7 @@ def global_trainer_search(search_text=None,category=None, city_filter=None, page
     if category:
         params["category"] = f"%{category}%"
         where_conditions.append("LOWER(t.expertise_in) LIKE LOWER(%(category)s)")
-
+    where_conditions.append("t.status = 'Approved'")
     where_clause = " AND ".join(where_conditions) if where_conditions else "1=1"
 
     query = f"""
@@ -655,6 +656,7 @@ def company_trainers(user, page=1, page_size=8):
         FROM tabTrainer t
         LEFT JOIN tabWishlist w ON w.trainers = t.trainer AND w.users = %(user)s
         LEFT JOIN `tabUnlocked Trainers` u ON u.trainer = t.trainer AND u.user = %(user)s
+	WHERE t.status = 'Approved'
         ORDER BY t.avg_rating DESC
     """
 
@@ -921,14 +923,14 @@ def get_trainer_profile(trainer_id):
 @frappe.whitelist(allow_guest=True)
 def send_support_email(email, text, name):
     try:
-        yag = yagmail.SMTP("devarshi.b@cumulations.com", "djxb pjtf knol niud")
+        yag = yagmail.SMTP("earvintest30@gmail.com", "nsqf bmpx tzgc lzbv")
         headers = {}
 
         if email:
             headers["Reply-To"] = email
 
         yag.send(
-            to=['devarshi.b@cumulations.com'],
+            to=['earvintest30@gmail.com',email],
             subject='Support Request for Get Pros.',
             contents=f"""
                 <span><strong>Username:</strong> {name}</span><br>
