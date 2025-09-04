@@ -1,5 +1,6 @@
 import random
 import frappe
+import json
 from datetime import datetime, timedelta ,date
 import string
 import stripe
@@ -1007,4 +1008,150 @@ def reset_password(email, new_password):
         return {"status": "success", "message": "Password has been reset successfully"}
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Direct Password Reset API Error")
+        return {"status": "error", "message": str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def send_trainer_email():
+    try:
+        # Parse incoming JSON
+        data = json.loads(frappe.local.request.get_data(as_text=True))
+
+        # Required fields
+        full_name = data.get('full_name')
+        phone = data.get('phone')
+        if not full_name or not phone:
+            return {"status": "error", "message": "Full Name and Phone are required"}
+
+        # Extract all fields
+        bio_line = data.get('bio_line', '')
+        experience = data.get('experience', '')
+        city = data.get('city', '')
+        expertise_in = data.get('expertise_in', '')
+        language = data.get('language', '')
+        charge = data.get('charge', '')
+        profile_views = data.get('profile_views', 0)
+        avg_rating = data.get('avg_rating', 0)
+        image = data.get('image', '')
+        dob = data.get('dob', '')
+
+        education = data.get('education', [])
+        certificates = data.get('certificates', [])
+        testimonials = data.get('testimonials', [])
+
+        facebook = data.get('facebook', '#')
+        instagram = data.get('instagram', '#')
+        twitter = data.get('twitter', '#')
+        linkedin = data.get('linkedin', '#')
+        personal_website = data.get('personal_website', '#')
+
+        # Convert lists to HTML
+        education_html = "".join([f"<li>{e.get('course')} - {e.get('institution')} ({e.get('year')})</li>" for e in education])
+        certificates_html = "".join([f"<li>{c.get('certificate_name')} (Issued by {c.get('issued_by')} in {c.get('issued_date')})</li>" for c in certificates])
+        testimonials_html = "".join([f"<blockquote style='margin:8px 0;padding:10px 12px;border-left:3px solid #e1e7f5;background:#fbfcff;color:#444;font-size:13px;'><strong>{t.get('client_name')}:</strong> {t.get('testimonials')}</blockquote>" for t in testimonials])
+
+        # Full HTML content
+        html_content = f"""
+        <!doctype html>
+        <html>
+        <head><meta charset="utf-8"><title>New Trainer Signup</title></head>
+        <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:30px 0;">
+            <tr><td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+                <tr>
+                  <td style="padding:20px 24px 8px 24px; text-align:left;"><img src='https://yourcompany.com/logo.png' width='160' alt='Logo'></td>
+                  <td style="padding:20px 24px 8px 0; text-align:right;"><small style='color:#888;font-size:12px;'>New trainer signup</small></td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style="padding:14px 24px;border-top:1px solid #eee;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="110" valign="top" style="padding-right:12px;"><img src='{image}' width='100' height='100' style='border-radius:8px;object-fit:cover;'></td>
+                        <td valign="top" style="padding-top:4px;">
+                          <h2 style='margin:0 0 6px 0;font-size:20px;color:#111;'>{full_name}</h2>
+                          <p style='margin:0;color:#555;font-size:14px;line-height:1.4;'>
+                            <strong>City:</strong> {city} &nbsp;|&nbsp;
+                            <strong>Experience:</strong> {experience} &nbsp;|&nbsp;
+                            <strong>Charge:</strong> {charge}
+                          </p>
+                          <p style='margin:8px 0 0 0;color:#777;font-size:13px;'>{bio_line}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style="padding:16px 24px;border-top:1px solid #f0f0f0;">
+                    <table width="100%" cellpadding="6" cellspacing="0" style="font-size:14px;color:#444;">
+                      <tr><td width='160'><strong>Expertise</strong></td><td>{expertise_in}</td></tr>
+                      <tr><td><strong>Languages</strong></td><td>{language}</td></tr>
+                      <tr><td><strong>Avg Rating</strong></td><td>{avg_rating} / 5</td></tr>
+                      <tr><td><strong>Profile Views</strong></td><td>{profile_views}</td></tr>
+                      <tr><td><strong>DOB</strong></td><td>{dob}</td></tr>
+                      <tr><td><strong>Phone</strong></td><td><a href='tel:{phone}' style='color:#1a73e8;text-decoration:none;'>{phone}</a></td></tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style="padding:0 24px 16px 24px;border-top:1px solid #f0f0f0;">
+                    <strong>Education</strong>
+                    <ul style='margin:8px 0 0 18px;color:#555;font-size:13px;'>{education_html}</ul>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style="padding:0 24px 16px 24px;border-top:1px solid #f0f0f0;">
+                    <strong>Certificates</strong>
+                    <ul style='margin:8px 0 0 18px;color:#555;font-size:13px;'>{certificates_html}</ul>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style="padding:0 24px 16px 24px;border-top:1px solid #f0f0f0;">
+                    <strong>Testimonials</strong>
+                    {testimonials_html}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style="padding:12px 24px 24px 24px;border-top:1px solid #f0f0f0;">
+                    <strong>Social / Links</strong>
+                    <p style='margin:8px 0 0 0;font-size:13px;'>
+                      <a href='{facebook}' style='color:#1a73e8;'>Facebook</a> |
+                      <a href='{instagram}' style='color:#1a73e8;'>Instagram</a> |
+                      <a href='{twitter}' style='color:#1a73e8;'>Twitter</a> |
+                      <a href='{linkedin}' style='color:#1a73e8;'>LinkedIn</a> |
+                      <a href='{personal_website}' style='color:#1a73e8;'>Website</a>
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2" style='padding:14px 24px;background:#fafafa;text-align:center;font-size:12px;color:#888;border-top:1px solid #eee;'>
+                    This is an automated notification. To view the trainer profile in the admin panel, <a href='https://youradminpanel.com' style='color:#1a73e8;'>click here</a>.
+                  </td>
+                </tr>
+
+              </table>
+            </td></tr>
+          </table>
+        </body>
+        </html>
+        """
+
+        # Send email using Yagmail
+        yag = yagmail.SMTP('hi@thethoughtbulb.com', "uutc wvya uxvw gejt")
+        yag.send(
+            to=['devarshi.b@cumulations.com', 'prafullakumar.m@cumulations.com'],
+            subject=f"Trainer Details - {full_name}",
+            contents=html_content
+        )
+
+        return {"status": "success", "message": "Email sent successfully"}
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Send Trainer Email API (Yagmail)")
         return {"status": "error", "message": str(e)}
