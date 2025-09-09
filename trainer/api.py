@@ -928,14 +928,14 @@ def get_trainer_profile(trainer_id):
 @frappe.whitelist(allow_guest=True)
 def send_support_email(email, text, name):
     try:
-        yag = yagmail.SMTP("earvintest30@gmail.com", "nsqf bmpx tzgc lzbv")
+        yag = yagmail.SMTP("hi@thethoughtbulb.com", "uutc wvya uxvw gejt")
         headers = {}
 
         if email:
             headers["Reply-To"] = email
 
         yag.send(
-            to=['earvintest30@gmail.com',email],
+            to=["hi@thethoughtbulb.com",email],
             subject='Support Request for Get Pros.',
             contents=f"""
                 <span><strong>Username:</strong> {name}</span><br>
@@ -967,8 +967,8 @@ def generate_otp(email):
     return("OTP sent successfully")
 
 def send_otp_email(email, otp):
-    yag = yagmail.SMTP("devarshi.b@cumulations.com", "djxb pjtf knol niud")
-    yag.send(to=email, subject="OTP for Bandan", contents=f"OTP for is {otp} and valid for 10 min")
+    yag = yagmail.SMTP("hi@thethoughtbulb.com", "uutc wvya uxvw gejt")
+    yag.send(to=email, subject="GetPros: Reset Password OTP", contents=f"Your GetPros password reset OTP is {otp} and is valid for 10 minutes.")
 
 @frappe.whitelist(allow_guest = True)
 def verify_otp(email, entered_otp):
@@ -1010,19 +1010,27 @@ def reset_password(email, new_password):
         frappe.log_error(frappe.get_traceback(), "Direct Password Reset API Error")
         return {"status": "error", "message": str(e)}
 
+import frappe
+import json
+import yagmail
+
 @frappe.whitelist(allow_guest=True)
 def send_trainer_email():
+    """
+    API endpoint to send a formatted trainer signup email.
+    Expects a JSON body with trainer details.
+    """
     try:
-        # Parse incoming JSON
+        # Parse JSON body
         data = json.loads(frappe.local.request.get_data(as_text=True))
 
-        # Required fields
+        # ✅ Required fields
         full_name = data.get('full_name')
         phone = data.get('phone')
         if not full_name or not phone:
             return {"status": "error", "message": "Full Name and Phone are required"}
 
-        # Extract all fields
+        # ✅ Optional fields
         bio_line = data.get('bio_line', '')
         experience = data.get('experience', '')
         city = data.get('city', '')
@@ -1044,109 +1052,161 @@ def send_trainer_email():
         linkedin = data.get('linkedin', '#')
         personal_website = data.get('personal_website', '#')
 
-        # Convert lists to HTML
-        education_html = "".join([f"<li>{e.get('course')} - {e.get('institution')} ({e.get('year')})</li>" for e in education])
-        certificates_html = "".join([f"<li>{c.get('certificate_name')} (Issued by {c.get('issued_by')} in {c.get('issued_date')})</li>" for c in certificates])
-        testimonials_html = "".join([f"<blockquote style='margin:8px 0;padding:10px 12px;border-left:3px solid #e1e7f5;background:#fbfcff;color:#444;font-size:13px;'><strong>{t.get('client_name')}:</strong> {t.get('testimonials')}</blockquote>" for t in testimonials])
+        # ✅ Convert lists to HTML
+        education_html = "".join([
+            f"<li>{e.get('course')} - {e.get('institution')} ({e.get('year')})</li>"
+            for e in education
+        ])
+        certificates_html = "".join([
+            f"<li>{c.get('certificate_name')} (Issued by {c.get('issued_by')} in {c.get('issued_date')})</li>"
+            for c in certificates
+        ])
+        testimonials_html = "".join([
+            f"<blockquote style='margin:8px 0;padding:10px 12px;border-left:3px solid #e1e7f5;background:#fbfcff;color:#444;font-size:13px;'>"
+            f"<strong>{t.get('client_name')}:</strong> {t.get('testimonials')}</blockquote>"
+            for t in testimonials
+        ])
 
-        # Full HTML content
+        # ✅ Full HTML email content
         html_content = f"""
-        <!doctype html>
-        <html>
-        <head><meta charset="utf-8"><title>New Trainer Signup</title></head>
-        <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:30px 0;">
-            <tr><td align="center">
-              <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08);">
-                <tr>
-                  <td style="padding:20px 24px 8px 24px; text-align:left;"><img src='https://yourcompany.com/logo.png' width='160' alt='Logo'></td>
-                  <td style="padding:20px 24px 8px 0; text-align:right;"><small style='color:#888;font-size:12px;'>New trainer signup</small></td>
-                </tr>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>New Trainer Signup</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:'Segoe UI',Roboto,Arial,Helvetica,sans-serif;">
 
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:40px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Outer Card -->
+        <table width="650" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:24px;text-align:left;">
+              <img src="{image}" alt="GetPros" style="height:32px;">
+            </td>
+            <td style="padding:24px;text-align:right;font-size:12px;color:#666;">
+              <strong>New Trainer Signup</strong><br>
+              <span style="color:#999;">Automated notification</span>
+            </td>
+          </tr>
+
+          <!-- Trainer Info -->
+          <tr>
+            <td colspan="2" style="padding:24px;border-top:1px solid #eee;">
+              <table width="100%">
                 <tr>
-                  <td colspan="2" style="padding:14px 24px;border-top:1px solid #eee;">
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td width="110" valign="top" style="padding-right:12px;"><img src='{image}' width='100' height='100' style='border-radius:8px;object-fit:cover;'></td>
-                        <td valign="top" style="padding-top:4px;">
-                          <h2 style='margin:0 0 6px 0;font-size:20px;color:#111;'>{full_name}</h2>
-                          <p style='margin:0;color:#555;font-size:14px;line-height:1.4;'>
-                            <strong>City:</strong> {city} &nbsp;|&nbsp;
-                            <strong>Experience:</strong> {experience} &nbsp;|&nbsp;
-                            <strong>Charge:</strong> {charge}
-                          </p>
-                          <p style='margin:8px 0 0 0;color:#777;font-size:13px;'>{bio_line}</p>
-                        </td>
-                      </tr>
-                    </table>
+                  <td width="100" valign="top">
+                    <img src="{image}" width="90" height="90" style="border-radius:12px;object-fit:cover;border:2px solid #f0f0f0;">
                   </td>
-                </tr>
-
-                <tr>
-                  <td colspan="2" style="padding:16px 24px;border-top:1px solid #f0f0f0;">
-                    <table width="100%" cellpadding="6" cellspacing="0" style="font-size:14px;color:#444;">
-                      <tr><td width='160'><strong>Expertise</strong></td><td>{expertise_in}</td></tr>
-                      <tr><td><strong>Languages</strong></td><td>{language}</td></tr>
-                      <tr><td><strong>Avg Rating</strong></td><td>{avg_rating} / 5</td></tr>
-                      <tr><td><strong>Profile Views</strong></td><td>{profile_views}</td></tr>
-                      <tr><td><strong>DOB</strong></td><td>{dob}</td></tr>
-                      <tr><td><strong>Phone</strong></td><td><a href='tel:{phone}' style='color:#1a73e8;text-decoration:none;'>{phone}</a></td></tr>
-                    </table>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td colspan="2" style="padding:0 24px 16px 24px;border-top:1px solid #f0f0f0;">
-                    <strong>Education</strong>
-                    <ul style='margin:8px 0 0 18px;color:#555;font-size:13px;'>{education_html}</ul>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td colspan="2" style="padding:0 24px 16px 24px;border-top:1px solid #f0f0f0;">
-                    <strong>Certificates</strong>
-                    <ul style='margin:8px 0 0 18px;color:#555;font-size:13px;'>{certificates_html}</ul>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td colspan="2" style="padding:0 24px 16px 24px;border-top:1px solid #f0f0f0;">
-                    <strong>Testimonials</strong>
-                    {testimonials_html}
-                  </td>
-                </tr>
-
-                <tr>
-                  <td colspan="2" style="padding:12px 24px 24px 24px;border-top:1px solid #f0f0f0;">
-                    <strong>Social / Links</strong>
-                    <p style='margin:8px 0 0 0;font-size:13px;'>
-                      <a href='{facebook}' style='color:#1a73e8;'>Facebook</a> |
-                      <a href='{instagram}' style='color:#1a73e8;'>Instagram</a> |
-                      <a href='{twitter}' style='color:#1a73e8;'>Twitter</a> |
-                      <a href='{linkedin}' style='color:#1a73e8;'>LinkedIn</a> |
-                      <a href='{personal_website}' style='color:#1a73e8;'>Website</a>
+                  <td valign="top" style="padding-left:20px;">
+                    <h2 style="margin:0;font-size:22px;color:#111;font-weight:600;">{full_name}</h2>
+                    <p style="margin:6px 0;color:#444;font-size:14px;line-height:1.5;">
+                      {city} • {experience} years experience • <strong style="color:#111;">₹{charge} / session</strong>
+                    </p>
+                    <p style="margin:10px 0 0 0;color:#555;font-size:13px;line-height:1.6;">
+                      {bio_line}
                     </p>
                   </td>
                 </tr>
+              </table>
+            </td>
+          </tr>
 
+          <!-- Info Cards -->
+          <tr>
+            <td colspan="2" style="padding:20px 24px;border-top:1px solid #f0f0f0;">
+              <table width="100%" cellpadding="12" cellspacing="0">
                 <tr>
-                  <td colspan="2" style='padding:14px 24px;background:#fafafa;text-align:center;font-size:12px;color:#888;border-top:1px solid #eee;'>
-                    This is an automated notification. To view the trainer profile in the admin panel, <a href='https://youradminpanel.com' style='color:#1a73e8;'>click here</a>.
+                  <td style="background:#f9fafc;border-radius:10px;font-size:13px;color:#333;">
+                    <strong style="color:#111;">Expertise</strong><br>{expertise_in}
+                  </td>
+                  <td style="background:#f9fafc;border-radius:10px;font-size:13px;color:#333;">
+                    <strong style="color:#111;">Languages</strong><br>{language}
                   </td>
                 </tr>
-
+                <tr>
+                  <td style="background:#f9fafc;border-radius:10px;font-size:13px;color:#333;">
+                    <strong style="color:#111;">DOB</strong><br>{dob}
+                  </td>
+                  <td style="background:#f9fafc;border-radius:10px;font-size:13px;color:#333;">
+                    <strong style="color:#111;">Phone</strong><br><a href="tel:{phone}" style="color:#1a73e8;text-decoration:none;">{phone}</a>
+                  </td>
+                </tr>
               </table>
-            </td></tr>
-          </table>
-        </body>
-        </html>
+            </td>
+          </tr>
+
+          <!-- Education & Certificates -->
+          <tr>
+            <td colspan="2" style="padding:24px;border-top:1px solid #f0f0f0;">
+              <table width="100%">
+                <tr>
+                  <td valign="top" width="50%">
+                    <strong style="color:#111;font-size:14px;">Education</strong>
+                    <ul style="margin:10px 0 0 18px;padding:0;font-size:13px;color:#555;line-height:1.6;">
+                      {education_html}
+                    </ul>
+                  </td>
+                  <td valign="top" width="50%">
+                    <strong style="color:#111;font-size:14px;">Certificates</strong>
+                    <ul style="margin:10px 0 0 18px;padding:0;font-size:13px;color:#555;line-height:1.6;">
+                      {certificates_html}
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Testimonials -->
+          <tr>
+            <td colspan="2" style="padding:24px;border-top:1px solid #f0f0f0;">
+              <strong style="color:#111;font-size:14px;">Testimonials</strong>
+              <div style="margin-top:12px;font-size:13px;color:#444;line-height:1.6;">
+                {testimonials_html}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Social Links -->
+          <tr>
+            <td colspan="2" style="padding:20px 24px;border-top:1px solid #f0f0f0;">
+              <strong style="color:#111;font-size:14px;">Social / Links</strong>
+              <p style="margin:10px 0 0 0;font-size:13px;">
+                <a href="{facebook}" style="color:#1a73e8;text-decoration:none;">Facebook</a> |
+                <a href="{instagram}" style="color:#1a73e8;text-decoration:none;">Instagram</a> |
+                <a href="{twitter}" style="color:#1a73e8;text-decoration:none;">Twitter</a> |
+                <a href="{linkedin}" style="color:#1a73e8;text-decoration:none;">LinkedIn</a> |
+                <a href="{personal_website}" style="color:#1a73e8;text-decoration:none;">Website</a>
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td colspan="2" align="center" style="padding:20px;font-size:12px;color:#999;border-top:1px solid #f0f0f0;">
+              GetPros • © 2025
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+
         """
 
-        # Send email using Yagmail
-        yag = yagmail.SMTP('hi@thethoughtbulb.com', "uutc wvya uxvw gejt")
+        yag = yagmail.SMTP("hi@thethoughtbulb.com", "uutc wvya uxvw gejt")
         yag.send(
-            to=['devarshi.b@cumulations.com', 'prafullakumar.m@cumulations.com'],
-            subject=f"Trainer Details - {full_name}",
+            to=["devarshi.b@cumulations.com", "prafullakumar.m@cumulations.com"],
+            subject=f"[GetPros] New Trainer Signup: {full_name} ({city})",
             contents=html_content
         )
 
