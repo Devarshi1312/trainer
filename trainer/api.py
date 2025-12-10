@@ -227,7 +227,7 @@ def get_all_trainers(user, page=1, page_size=10):
         SELECT 
             t.trainer,
             t.name,
-            t.first_name,
+            t.full_name,
             t.cover_image, 
             t.image, 
             t.avg_rating,
@@ -858,11 +858,14 @@ def get_trainer_profile(trainer_id):
     if reviews:
         total = sum([r.rating for r in reviews])
         avg_rating = round(total / len(reviews), 1)
+        
+    full_name =  trainer_doc.first_name
+    if trainer_doc.last_name: full_name += " " + trainer_doc.last_name
 
     trainer_data = {
         "name": trainer_doc.name,
         "trainer": trainer_doc.trainer,
-        "full_name": trainer_doc.first_name,
+        "full_name": full_name,
         "bio_line": trainer_doc.bio_line,
         "experience": trainer_doc.experience,
         "city": trainer_doc.city,
