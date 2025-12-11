@@ -325,6 +325,7 @@ def get_all_trainers(user, page=1, page_size=10):
         if reviews:
             total = sum([r.rating for r in reviews])
             avg_rating = round(total / len(reviews), 1)
+
         trainer["avg_rating"] = avg_rating
     return {
         "total": total_count,
@@ -858,6 +859,8 @@ def get_trainer_profile(trainer_id):
     if reviews:
         total = sum([r.rating for r in reviews])
         avg_rating = round(total / len(reviews), 1)
+    else : 
+        avg_rating = random.uniform(3.0, 4.0)
         
     full_name =  trainer_doc.first_name
     if trainer_doc.last_name: full_name += " " + trainer_doc.last_name
@@ -876,7 +879,7 @@ def get_trainer_profile(trainer_id):
         "avg_rating": avg_rating,
         "image": trainer_doc.image,
 	"total_unlocks":len(unlocks),
-	"total_reviews":len(reviews),
+	"total_reviews":len(reviews) | 1,
         "training_approach": trainer_doc.training_approach,
         "education": [
             {
