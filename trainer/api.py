@@ -776,7 +776,7 @@ def get_trainer(trainer_id):
         "charge": trainer_doc.charge,
         "profile_views": trainer_doc.profile_views,
         "avg_rating": avg_rating,
-	"total_reviews":len(reviews) | 1,
+	"total_reviews":len(reviews),
         "image": trainer_doc.image,
 	"total_unlocks":len(unlocks),
         "training_approach": trainer_doc.training_approach,
@@ -886,7 +886,7 @@ def get_trainer_profile(trainer_id):
         "avg_rating": avg_rating,
         "image": trainer_doc.image,
 	"total_unlocks":len(unlocks),
-	"total_reviews":len(reviews) | 1,
+	"total_reviews":len(reviews),
         "training_approach": trainer_doc.training_approach,
         "education": [
             {
