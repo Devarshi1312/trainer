@@ -325,6 +325,8 @@ def get_all_trainers(user, page=1, page_size=10):
         if reviews:
             total = sum([r.rating for r in reviews])
             avg_rating = round(total / len(reviews), 1)
+        else : 
+            avg_rating = 3.0
 
         trainer["avg_rating"] = avg_rating
     return {
@@ -618,6 +620,9 @@ def global_trainer_search(search_text=None,category=None, city_filter=None, page
         if reviews:
             total = sum([r.rating for r in reviews])
             avg_rating = round(total / len(reviews), 1)
+        else :
+            avg_rating = 3.0
+
         trainer["avg_rating"] = avg_rating
     frappe.response["data"] = {
         "results": trainers,
@@ -756,6 +761,8 @@ def get_trainer(trainer_id):
     if reviews:
         total = sum([r.rating for r in reviews])
         avg_rating = round(total / len(reviews), 1)
+    else :
+        avg_rating = 3.0
 
     trainer_data = {
         "name": trainer_doc.name,
@@ -769,7 +776,7 @@ def get_trainer(trainer_id):
         "charge": trainer_doc.charge,
         "profile_views": trainer_doc.profile_views,
         "avg_rating": avg_rating,
-	"total_reviews":len(reviews),
+	"total_reviews":len(reviews) | 1,
         "image": trainer_doc.image,
 	"total_unlocks":len(unlocks),
         "training_approach": trainer_doc.training_approach,
@@ -860,7 +867,7 @@ def get_trainer_profile(trainer_id):
         total = sum([r.rating for r in reviews])
         avg_rating = round(total / len(reviews), 1)
     else : 
-        avg_rating = random.uniform(3.0, 4.0)
+        avg_rating = 3.0
         
     full_name =  trainer_doc.first_name
     if trainer_doc.last_name: full_name += " " + trainer_doc.last_name
