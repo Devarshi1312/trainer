@@ -1218,7 +1218,7 @@ def send_trainer_email():
 
         yag = yagmail.SMTP("hi@thethoughtbulb.com", "uutc wvya uxvw gejt")
         yag.send(
-            to=["devarshi.b@cumulations.com", "prafullakumar.m@cumulations.com"],
+            to=["komal@thethoughtbulb.com"],
             subject=f"[GetPros] New Trainer Signup: {full_name} ({city})",
             contents=html_content
         )
